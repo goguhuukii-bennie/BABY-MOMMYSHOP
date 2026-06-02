@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสร้างบิลตะกร้าสินค้า - Hangyodon Ocean (Single Ultimate Version)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --my-font: 'Mali', sans-serif;
+            --bg-ocean: #e0f2f1;       
+            --fish-blue: #49a0b0;      
+            --fish-blue-light: #b2dfdb;
+            --squid-pink: #ffb7b2;     
+            --text-dark: #2c5d63;      
+            --text-light: #608c93;
+            --basket-cream: #fffdf6;   
+        }
+
+        body { font-family: var(--my-font); color: var(--text-dark); margin: 0; padding: 30px 20px; background: linear-gradient(135deg, #e0f7fa 0%, #b2dfdb 50%, #ffdfd3 100%); position: relative; }
+        .web-deco-squid { position: fixed; top: 40px; left: 30px; font-size: 4.5rem; filter: drop-shadow(4px 6px 0px rgba(0,0,0,0.05)); animation: swim 4s ease-in-out infinite alternate; z-index: -1; }
+        .web-deco-bubble { position: fixed; bottom: 80px; right: 40px; font-size: 3.5rem; opacity: 0.6; animation: swim 3s ease-in-out infinite alternate-reverse; z-index: -1; }
+        @keyframes swim { 0% { transform: translateY(0px) rotate(-5deg); } 100% { transform: translateY(-15px) rotate(10deg); } }
+        .container { display: flex; max-width: 1200px; margin: 0 auto; gap: 40px; flex-wrap: wrap; justify-content: center; }
+        .form-section { flex: 1; min-width: 360px; max-width: 500px; background: rgba(255, 255, 255, 0.96); padding: 30px; border-radius: 28px; box-shadow: 0 12px 35px rgba(44, 93, 99, 0.1); border: 2px solid var(--fish-blue-light); }
+        h2 { margin-top: 0; color: var(--fish-blue); font-size: 1.4rem; text-align: center; border-bottom: 2px dashed var(--fish-blue-light); padding-bottom: 12px; font-weight: 700; }
+        .form-group { margin-bottom: 18px; }
+        .bank-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f7fcfc; padding: 12px; border-radius: 14px; border: 1px solid var(--fish-blue-light); }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+        .flex-inputs { display: flex; gap: 8px; }
+        input[type="text"], input[type="number"], input[type="datetime-local"], textarea, select { width: 100%; padding: 11px; border: 2px solid var(--fish-blue-light); border-radius: 12px; box-sizing: border-box; font-family: var(--my-font); outline: none; background-color: #ffffff; font-size: 0.95rem; color: var(--text-dark); }
+        input:focus, textarea:focus, select:focus { border-color: var(--fish-blue); background-color: #f4fbfb; }
+        .stamp-selector-box { background: #fff4f2; padding: 14px; border-radius: 16px; border: 2px dashed var(--squid-pink); margin-bottom: 20px; }
+        .product-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn { font-family: var(--my-font); padding: 11px 20px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+        .btn-add { background-color: #c8e6c9; color: #256029; }
+        .btn-remove { background-color: #ffcdd2; color: #c62828; }
+        .btn-rand { background-color: var(--fish-blue-light); color: var(--text-dark); font-size: 0.85rem; padding: 0 15px; }
+        .btn-generate { background: linear-gradient(135deg, var(--fish-blue) 0%, #80deea 100%); color: white; width: 100%; font-size: 1.15rem; padding: 14px; margin-top: 25px; box-shadow: 0 6px 18px rgba(73, 160, 176, 0.3); }
+        .btn:hover { transform: translateY(-2px); opacity: 0.95; }
+        .preview-section { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .basket-receipt { width: 380px; height: 855px; background-color: var(--bg-ocean); border: 14px solid var(--fish-blue-light); border-radius: 32px; box-shadow: 0 20px 45px rgba(44, 93, 99, 0.15); position: relative; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; overflow: hidden; background-image: linear-gradient(rgba(73, 160, 176, 0.08) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(73, 160, 176, 0.08) 1.5px, transparent 1.5px); background-size: 32px 32px; }
+        .receipt-inner { background: rgba(255, 255, 255, 0.97); border-radius: 20px; padding: 18px; flex: 1; display: flex; flex-direction: column; border: 1.5px solid #e0f2f1; position: relative; margin-top: 10px; }
+        .receipt-clip { position: absolute; top: -15px; right: 25px; padding: 4px 12px; font-size: 0.72rem; font-weight: 700; color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.12); z-index: 100; letter-spacing: 0.5px; transform: rotate(-2deg); display: none; }
+        .receipt-clip::before { content: ""; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 18px; height: 12px; border: 2.5px solid #757575; border-bottom: none; border-radius: 6px 6px 0 0; }
+        .clip-pending { display: block; background: linear-gradient(135deg, #f4a261 0%, #e76f51 100%); }
+        .clip-paid { display: block; background: linear-gradient(135deg, #4db6ac 0%, #00796b 100%); }
+        .receipt-header { text-align: center; font-size: 1.15rem; font-weight: 700; color: var(--fish-blue); margin-top: 5px; letter-spacing: 1px; }
+        .shop-name-box { text-align: center; margin-bottom: 16px; }
+        .shop-name { font-size: 1.05rem; font-weight: 700; color: white; background: var(--fish-blue); padding: 5px 20px; border-radius: 20px; display: inline-block; box-shadow: 0 4px 10px rgba(73, 160, 176, 0.2); }
+        .customer-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; color: var(--text-light); border-bottom: 2px dashed var(--fish-blue-light); padding-bottom: 10px; margin-bottom: 14px; }
+        .customer-table td { padding: 3px 0; vertical-align: top; }
+        .customer-table .label-cell { width: 78px; white-space: nowrap; color: var(--text-dark); font-weight: 600; }
+        .customer-table .value-cell { padding-left: 4px; }
+        .bill-id-tag { display: inline-block; font-size: 0.72rem; background: #e0f2f1; color: var(--fish-blue); padding: 1px 8px; border-radius: 6px; font-weight: 700; float: right; }
+        .item-list-container { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .item-list { position: relative; z-index: 2; flex: 1; }
+        .item-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px dotted var(--fish-blue-light); color: var(--text-dark); }
+        .item-row .prod-price-tag { font-weight: 700; color: var(--fish-blue); white-space: nowrap; }
+        .thankyou-card { background: #f0fbfb; border: 1.5px dashed var(--fish-blue); border-radius: 12px; padding: 10px; text-align: center; font-size: 0.8rem; margin-bottom: 6px; color: var(--text-dark); line-height: 1.4; }
+        .total-section { border-top: 3px dashed var(--fish-blue-light); padding-top: 14px; margin-top: 10px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; color: var(--fish-blue); position: relative; width: 100%; }
+        .total-section::before, .total-section::after { content: ""; position: absolute; top: -10px; width: 18px; height: 18px; background-color: var(--bg-ocean); border-radius: 50%; z-index: 5; }
+        .total-section::before { left: -28px; } .total-section::after { right: -28px; }
+        .total-price-text { white-space: nowrap; color: #d87d63; }
+        .payment-section { background: linear-gradient(135deg, #ffffff 0%, #e0f2f1 100%); padding: 12px; border-radius: 18px; border: 1.5px solid var(--fish-blue-light); display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box; transition: all 0.3s ease; }
+        .paid-success-message { display: none; text-align: center; padding: 20px; border: 2px dashed #4db6ac; border-radius: 18px; color: #00796b; font-size: 0.9rem; font-weight: 700; width: 100%; box-sizing: border-box; background: #f4fbf9; }
+        .account-display-box { width: 100%; text-align: center; font-size: 0.82rem; line-height: 1.5; background: white; padding: 8px; border-radius: 12px; border: 1px solid #e0f2f1; box-sizing: border-box; }
+        .acc-bank-name { font-weight: 700; color: var(--text-dark); font-size: 0.85rem; }
+        .acc-number { font-weight: 700; font-size: 1.05rem; color: var(--fish-blue); margin: 2px 0; }
+        .acc-owner { font-size: 0.78rem; color: var(--text-light); }
+        .qrcode-container-cute { position: relative; width: 155px; height: 155px; margin: 10px auto 0 auto; background: linear-gradient(135deg, var(--fish-blue-light), var(--squid-pink)); padding: 4px; border-radius: 14px; box-sizing: border-box; }
+        .qrcode-container-cute::before { content: "🐟"; position: absolute; top: -14px; left: 4px; font-size: 1.1rem; }
+        .qrcode-container-cute::after { content: "🐙"; position: absolute; top: -10px; right: 4px; font-size: 1rem; }
+        .qrcode-wrapper { width: 100%; height: 100%; background: white; border-radius: 11px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .qrcode-wrapper img { width: 100%; height: 100%; object-fit: contain; }
+        .action-guide-bottom { text-align: center; font-size: 0.75rem; color: #d87d63; background: #fff5f2; padding: 6px 10px; border-radius: 10px; margin-top: 12px; width: 100%; box-sizing: border-box; font-weight: 600; border: 1px dashed var(--squid-pink); }
+        .sticker { position: absolute; font-size: 1.4rem; z-index: 5; animation: float 3.5s ease-in-out infinite alternate; }
+        .stk-1 { top: 16px; left: 16px; animation-delay: 0s; }
+        .stk-2 { top: 38%; right: 16px; animation-delay: 0.6s; }
+        .stk-3 { bottom: 16px; left: 16px; animation-delay: 1.2s; }
+        .stk-4 { top: 16px; right: 16px; font-size: 1.1rem; }
+        @keyframes float { 0% { transform: translateY(0px) rotate(-3deg); } 100% { transform: translateY(-5px) rotate(4deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="web-deco-squid">🐙</div>
+    <div class="web-deco-bubble">🫧</div>
+
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; color: var(--text-dark);">🐟 ระบบสร้างบิลตะกร้าสินค้าธีม Hangyodon Ocean 🌊</h1>
+        <p style="margin: 0; color: var(--text-light); font-size: 0.95rem;">[เวอร์ชัน Ultimate ใบเดียวจบ - สลับสถานะได้เนี๊ยบระดับมืออาชีพ]</p>
+    </div>
+
+    <div class="container">
+        <div class="form-section">
+            <h2>✏️ กรอกข้อมูลตะกร้าสินค้า</h2>
+            
+            <div class="stamp-selector-box">
+                <label style="color: #c62828; font-size: 0.95rem;">🎯 เลือกสถานะตัวหนีบบนบิล</label>
+                <select id="inputStampStatus" onchange="updatePreview()">
+                    <option value="pending" selected>⏳ รอชำระเงิน (PENDING)</option>
+                    <option value="paid">✨ ชำระเงินแล้ว (PAID)</option>
+                    <option value="none">❌ ไม่แสดงตัวหนีบ</option>
+                </select>
+            </div>
+
+            <!-- ส่วนเสริมใหม่: ช่องกรอกข้อความสำหรับโหมด PAID พร้อมปุ่ม Template/Copy -->
+            <div class="form-group" style="background:#e8f5e9; padding:12px; border-radius:16px; border: 1px dashed #2e7d32;">
+                <label style="color:#2e7d32; font-size: 0.9rem;">✨ ข้อความโหมด PAID (สลับ Template ได้)</label>
+                <div style="display:flex; gap:5px; margin-bottom:8px;">
+                    <button class="btn" style="padding:4px 8px; font-size:0.75rem; background:#49a0b0; color:white;" onclick="setTemplate('line')">ขอ LINE</button>
+                    <button class="btn" style="padding:4px 8px; font-size:0.75rem; background:#49a0b0; color:white;" onclick="setTemplate('email')">ขอ Email</button>
+                    <button class="btn" style="padding:4px 8px; font-size:0.75rem; background:#d87d63; color:white;" onclick="copyPaidMessage()">📋 คัดลอก</button>
+                </div>
+                <textarea id="inputPaidMessage" oninput="updatePreview()" style="font-size: 0.85rem; height: 80px;">🐳 ได้รับยอดเงินเรียบร้อยแล้วน้า รบกวนส่ง LINE ID หรือ Email เพื่อรับสินค้าทางแชทนี้ได้เลยจ้า ✨🩵</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>เลขที่บิล / รหัสออเดอร์</label>
+                <div class="flex-inputs">
+                    <input type="text" id="inputBillId" placeholder="เช่น #HG001" oninput="updatePreview()">
+                    <button class="btn btn-rand" onclick="randomizeBillId()">สุ่มเลข</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>ชื่อร้านค้า</label>
+                <input type="text" id="inputShop" value="🩵 Hangyodon Cute" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+                <label>ชื่อลูกค้า</label>
+                <input type="text" id="inputCustomer" value="เบบี้" oninput="updatePreview()">
+            </div>
+            
+            <div class="form-group">
+                <label>วันที่ / เวลาสั่งซื้อ</label>
+                <input type="datetime-local" id="inputDate" onchange="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>⏰ กำหนดชำระเงินภายใน</label>
+                <input type="text" id="inputDeadline" value="24 ชั่วโมงหลังจากได้รับบิลนี้" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>ข้อมูลบัญชีธนาคารร้านค้า</label>
+                <div class="bank-group">
+                    <div>
+                        <label style="font-size:0.8rem;">ชื่อธนาคาร</label>
+                        <input type="text" id="inputBankName" value="ธนาคารกสิกรไทย" oninput="updatePreview()">
+                    </div>
+                    <div>
+                        <label style="font-size:0.8rem;">เลขบัญชี</label>
+                        <input type="text" id="inputAccNo" value="084-6-38290-2" oninput="updatePreview()">
+                    </div>
+                </div>
+                <div style="margin-top: 8px;">
+                    <label style="font-size:0.8rem;">ชื่อเจ้าของบัญชี</label>
+                    <input type="text" id="inputAccOwner" value="ปริญญาศิริ ดิษพงษ์" oninput="updatePreview()">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>อัปโหลดรูป QR Code</label>
+                <input type="file" id="inputQR" accept="image/*" onchange="loadQRCode(event)">
+            </div>
+            <div class="form-group">
+                <label>ข้อความขอบคุณท้ายบิล</label>
+                <textarea id="inputThankyou" oninput="updatePreview()">ขอบคุณที่อุดหนุนน้า วันนี้ขอให้มีความสุขเหมือนได้ว่ายน้ำในทะเลกว้าง! 🐟🫧</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>📌 คำแนะนำการส่งสลิปสำหรับลูกค้า</label>
+                <input type="text" id="inputActionGuide" value="💬 โอนแล้วรบกวนส่งสลิปยืนยันกลับมาทางแชทนี้เลยน้า" oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+                <label>รายการสินค้าและราคา</label>
+                <div id="productInputsContainer">
+                    <div class="product-row">
+                        <input type="text" class="prod-name" value="พวงกุญแจตุ๊กตาปลาสีฟ้าตาโต" oninput="updatePreview()">
+                        <input type="number" class="prod-price" value="150" oninput="updatePreview()">
+                        <button class="btn btn-remove" onclick="removeProductRow(this)">ลบ</button>
+                    </div>
+                </div>
+                <button class="btn btn-add" style="width: 100%; margin-top: 8px;" onclick="addProductRow()">+ เพิ่มสินค้า</button>
+            </div>
+            <button class="btn btn-generate" onclick="generateImage()">📸 บันทึกรูปบิลสไตล์ Ocean คิ้วท์</button>
+        </div>
+
+        <div class="preview-section">
+            <div class="basket-receipt" id="receiptTarget">
+                <div class="sticker stk-1">🐟</div>
+                <div class="sticker stk-2">🫧</div>
+                <div class="sticker stk-3">🐚</div>
+                <div class="sticker stk-4">🍀</div>
+                
+                <div class="receipt-inner">
+                    <div class="receipt-clip" id="previewClip">PENDING ⏳</div>
+                    <div class="receipt-header">MY SHOPPING CART</div>
+                    <div class="shop-name-box"><div class="shop-name" id="previewShop">🩵 Hangyodon Cute</div></div>
+                    
+                    <table class="customer-table">
+                        <tr>
+                            <td class="label-cell">🌸 คุณลูกค้า:</td>
+                            <td class="value-cell" id="previewCustomer">-</td>
+                            <td style="vertical-align: middle;"><div class="bill-id-tag" id="previewBillId">#HG3955</div></td>
+                        </tr>
+                        <tr>
+                            <td class="label-cell">⏰ เวลาสั่งซื้อ:</td>
+                            <td class="value-cell" id="previewDate" colspan="2">-</td>
+                        </tr>
+                        <tr id="previewDeadlineRow">
+                            <td class="label-cell">⏳ โอนภายใน:</td>
+                            <td class="value-cell" id="previewDeadline" style="color: #d87d63;" colspan="2">-</td>
+                        </tr>
+                    </table>
+
+                    <div class="item-list-container">
+                        <div class="item-list" id="previewItems"></div>
+                    </div>
+
+                    <div class="thankyou-card" id="previewThankyou">-</div>
+
+                    <div class="total-section">
+                        <span>ยอดรวมทั้งสิ้น:</span>
+                        <span class="total-price-text"><span id="previewTotal">0</span> ฿</span>
+                    </div>
+
+                    <div class="payment-section" id="paymentSectionBlock">
+                        <div class="account-display-box">
+                            <div class="acc-bank-name" id="previewBankName">-</div>
+                            <div class="acc-number" id="previewAccNo">-</div>
+                            <div class="acc-owner" id="previewAccOwner">-</div>
+                        </div>
+                        <div class="qrcode-container-cute">
+                            <div class="qrcode-wrapper">
+                                <img id="previewQRImg" src="https://via.placeholder.com/220?text=Upload+QR+Code" alt="QR Code">
+                            </div>
+                        </div>
+                        <div class="action-guide-bottom" id="previewActionGuide">-</div>
+                    </div>
+
+                    <div class="paid-success-message" id="paidSuccessBlock"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('inputDate').value = now.toISOString().slice(0,16);
+            document.getElementById('inputBillId').value = `#HG3955`;
+            updatePreview();
+        };
+
+        function setTemplate(type) {
+            const textarea = document.getElementById('inputPaidMessage');
+            if(type === 'line') {
+                textarea.value = "🐳 ได้รับยอดเรียบร้อยแล้วค่ะ! รบกวนแจ้ง LINE ID ของคุณลูกค้าเพื่อส่งมอบสินค้าให้หน่อยนะคะ ✨🩵";
+            } else if(type === 'email') {
+                textarea.value = "🐳 ได้รับยอดเรียบร้อยแล้วค่ะ! รบกวนแจ้ง Email ของคุณลูกค้าเพื่อจัดส่งไฟล์ให้นะคะ ✨🩵";
+            }
+            updatePreview();
+        }
+
+        function copyPaidMessage() {
+            const textarea = document.getElementById('inputPaidMessage');
+            textarea.select();
+            document.execCommand('copy');
+            alert("คัดลอกข้อความเรียบร้อยแล้ว!");
+        }
+
+        function randomizeBillId() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('inputBillId').value = `#HG${randomNum}`;
+            updatePreview();
+        }
+
+        function addProductRow() {
+            const container = document.getElementById('productInputsContainer');
+            const row = document.createElement('div');
+            row.className = 'product-row';
+            row.innerHTML = `<input type="text" class="prod-name" oninput="updatePreview()"><input type="number" class="prod-price" oninput="updatePreview()"><button class="btn btn-remove" onclick="removeProductRow(this)">ลบ</button>`;
+            container.appendChild(row);
+            updatePreview();
+        }
+        function removeProductRow(button) { button.parentElement.remove(); updatePreview(); }
+        
+        function loadQRCode(event) {
+            const reader = new FileReader();
+            reader.onload = function() { document.getElementById('previewQRImg').src = reader.result; }
+            if(event.target.files[0]) { reader.readAsDataURL(event.target.files[0]); }
+        }
+
+        function updatePreview() {
+            document.getElementById('previewBillId').innerText = document.getElementById('inputBillId').value || '#0000';
+            document.getElementById('previewShop').innerText = document.getElementById('inputShop').value || 'ชื่อร้านค้า';
+            document.getElementById('previewCustomer').innerText = document.getElementById('inputCustomer').value || '-';
+            document.getElementById('previewDeadline').innerText = document.getElementById('inputDeadline').value || '-';
+            document.getElementById('previewThankyou').innerText = document.getElementById('inputThankyou').value || '';
+            document.getElementById('previewActionGuide').innerText = document.getElementById('inputActionGuide').value || '';
+            document.getElementById('previewBankName').innerText = document.getElementById('inputBankName').value || '-';
+            document.getElementById('previewAccNo').innerText = document.getElementById('inputAccNo').value || '-';
+            document.getElementById('previewAccOwner').innerText = document.getElementById('inputAccOwner').value || '-';
+            
+            const dateVal = document.getElementById('inputDate').value;
+            if(dateVal) {
+                const d = new Date(dateVal);
+                document.getElementById('previewDate').innerText = d.toLocaleString('th-TH', { hour12: false }).replace(',', '');
+            } else { document.getElementById('previewDate').innerText = '-'; }
+
+            const clipElement = document.getElementById('previewClip');
+            const stampStatus = document.getElementById('inputStampStatus').value;
+            
+            const paymentBlock = document.getElementById('paymentSectionBlock');
+            const paidBlock = document.getElementById('paidSuccessBlock');
+            const deadlineRow = document.getElementById('previewDeadlineRow');
+
+            if (stampStatus === 'pending') {
+                clipElement.style.display = 'block';
+                clipElement.innerText = "PENDING ⏳";
+                clipElement.className = "receipt-clip clip-pending";
+                paymentBlock.style.display = 'flex';
+                paidBlock.style.display = 'none';
+                deadlineRow.style.display = ''; 
+            } else if (stampStatus === 'paid') {
+                clipElement.style.display = 'block';
+                clipElement.innerText = "PAID ✨";
+                clipElement.className = "receipt-clip clip-paid";
+                paymentBlock.style.display = 'none';
+                paidBlock.style.display = 'block';
+                paidBlock.innerHTML = document.getElementById('inputPaidMessage').value.replace(/\n/g, '<br>');
+                deadlineRow.style.display = 'none';
+            } else {
+                clipElement.style.display = 'none'; 
+                paymentBlock.style.display = 'flex';
+                paidBlock.style.display = 'none';
+                deadlineRow.style.display = '';
+            }
+
+            const nameInputs = document.querySelectorAll('.prod-name');
+            const priceInputs = document.querySelectorAll('.prod-price');
+            const previewItemsContainer = document.getElementById('previewItems');
+            previewItemsContainer.innerHTML = '';
+            let total = 0;
+            nameInputs.forEach((input, index) => {
+                const name = input.value || 'สินค้า';
+                const price = parseFloat(priceInputs[index].value) || 0;
+                if(input.value || priceInputs[index].value) {
+                    total += price;
+                    const itemRow = document.createElement('div');
+                    itemRow.className = 'item-row';
+                    itemRow.innerHTML = `<span>🐟 ${name}</span> <strong class="prod-price-tag">${price.toLocaleString()} ฿</strong>`;
+                    previewItemsContainer.appendChild(itemRow);
+                }
+            });
+            document.getElementById('previewTotal').innerText = total.toLocaleString();
+        }
+
+        function generateImage() {
+            const target = document.getElementById('receiptTarget');
+            html2canvas(target, { useCORS: true, scale: 2, backgroundColor: null }).then(canvas => {
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                const customerName = document.getElementById('inputCustomer').value || 'OceanBill';
+                const status = document.getElementById('inputStampStatus').value;
+                link.download = `Ocean-${status}-${customerName}.png`;
+                link.href = image;
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
